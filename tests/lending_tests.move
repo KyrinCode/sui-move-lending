@@ -1,17 +1,13 @@
 #[test_only]
-module quest_overmind::lending_tests {
+module lending::lending_tests {
 
-    #[test_only]
     use sui::test_scenario;
-    #[test_only]
     use sui::test_utils::{assert_eq, destroy};
-    #[test_only]
     use sui::sui::SUI;
 
-    use quest_overmind::lending::{Self, ProtocolState, AdminCap, Pool};
+    use lending::lending::{Self, ProtocolState, AdminCap, Pool};
 
-    use std::vector;
-    use quest_overmind::dummy_oracle;
+    use lending::oracle;
     use sui::table;
     use sui::coin;
     use sui::balance;
@@ -21,15 +17,15 @@ module quest_overmind::lending_tests {
     //==============================================================================================
 
     #[test_only]
-    struct COIN1 has drop {}
+    public struct COIN1 has drop {}
     #[test_only]
-    struct COIN2 has drop {}
+    public struct COIN2 has drop {}
 
     #[test]
     fun test_init_success_resources_created() {
         let module_owner = @0xa;
 
-        let scenario_val = test_scenario::begin(module_owner);
+        let mut scenario_val = test_scenario::begin(module_owner);
         let scenario = &mut scenario_val;
 
         {
@@ -63,7 +59,7 @@ module quest_overmind::lending_tests {
     fun test_create_pool_success_one_pool_created() {
         let module_owner = @0xa;
 
-        let scenario_val = test_scenario::begin(module_owner);
+        let mut scenario_val = test_scenario::begin(module_owner);
         let scenario = &mut scenario_val;
 
         {
@@ -73,8 +69,8 @@ module quest_overmind::lending_tests {
 
 
         {
-            let admin_cap = test_scenario:: take_from_sender<AdminCap>(scenario);
-            let state = test_scenario::take_shared<ProtocolState>(scenario);
+            let mut admin_cap = test_scenario:: take_from_sender<AdminCap>(scenario);
+            let mut state = test_scenario::take_shared<ProtocolState>(scenario);
 
             lending::create_pool<SUI>(
                 &mut admin_cap, 
@@ -112,7 +108,7 @@ module quest_overmind::lending_tests {
     fun test_create_pool_success_multiple_pools_created() {
         let module_owner = @0xa;
 
-        let scenario_val = test_scenario::begin(module_owner);
+        let mut scenario_val = test_scenario::begin(module_owner);
         let scenario = &mut scenario_val;
 
         {
@@ -121,8 +117,8 @@ module quest_overmind::lending_tests {
         test_scenario::next_tx(scenario, module_owner);
 
         {
-            let admin_cap = test_scenario:: take_from_sender<AdminCap>(scenario);
-            let state = test_scenario::take_shared<ProtocolState>(scenario);
+            let mut admin_cap = test_scenario:: take_from_sender<AdminCap>(scenario);
+            let mut state = test_scenario::take_shared<ProtocolState>(scenario);
 
             lending::create_pool<SUI>(
                 &mut admin_cap, 
@@ -174,7 +170,7 @@ module quest_overmind::lending_tests {
         let module_owner = @0xa;
         let user = @0xb;
 
-        let scenario_val = test_scenario::begin(module_owner);
+        let mut scenario_val = test_scenario::begin(module_owner);
         let scenario = &mut scenario_val;
 
         {
@@ -183,8 +179,8 @@ module quest_overmind::lending_tests {
         test_scenario::next_tx(scenario, module_owner);
 
         {
-            let admin_cap = test_scenario:: take_from_sender<AdminCap>(scenario);
-            let state = test_scenario::take_shared<ProtocolState>(scenario);
+            let mut admin_cap = test_scenario:: take_from_sender<AdminCap>(scenario);
+            let mut state = test_scenario::take_shared<ProtocolState>(scenario);
 
             lending::create_pool<SUI>(
                 &mut admin_cap, 
@@ -199,8 +195,8 @@ module quest_overmind::lending_tests {
 
         let deposit_amount = 100_000_000_000; // 100 SUI
         {
-            let pool = test_scenario::take_shared<Pool<SUI>>(scenario);
-            let state = test_scenario::take_shared<ProtocolState>(scenario);
+            let mut pool = test_scenario::take_shared<Pool<SUI>>(scenario);
+            let mut state = test_scenario::take_shared<ProtocolState>(scenario);
 
 
             let coin = coin::mint_for_testing<SUI>(deposit_amount, test_scenario::ctx(scenario));
@@ -239,7 +235,7 @@ module quest_overmind::lending_tests {
         let module_owner = @0xa;
         let user = @0xb;
 
-        let scenario_val = test_scenario::begin(module_owner);
+        let mut scenario_val = test_scenario::begin(module_owner);
         let scenario = &mut scenario_val;
 
         {
@@ -248,8 +244,8 @@ module quest_overmind::lending_tests {
         test_scenario::next_tx(scenario, module_owner);
 
         {
-            let admin_cap = test_scenario:: take_from_sender<AdminCap>(scenario);
-            let state = test_scenario::take_shared<ProtocolState>(scenario);
+            let mut admin_cap = test_scenario:: take_from_sender<AdminCap>(scenario);
+            let mut state = test_scenario::take_shared<ProtocolState>(scenario);
 
             lending::create_pool<SUI>(
                 &mut admin_cap, 
@@ -264,8 +260,8 @@ module quest_overmind::lending_tests {
 
         let deposit_amount = 100_000_000_000; // 100 SUI
         {
-            let pool = test_scenario::take_shared<Pool<SUI>>(scenario);
-            let state = test_scenario::take_shared<ProtocolState>(scenario);
+            let mut pool = test_scenario::take_shared<Pool<SUI>>(scenario);
+            let mut state = test_scenario::take_shared<ProtocolState>(scenario);
 
             let coin = coin::mint_for_testing<SUI>(deposit_amount, test_scenario::ctx(scenario));
 
@@ -312,7 +308,7 @@ module quest_overmind::lending_tests {
         let module_owner = @0xa;
         let user = @0xb;
 
-        let scenario_val = test_scenario::begin(module_owner);
+        let mut scenario_val = test_scenario::begin(module_owner);
         let scenario = &mut scenario_val;
 
         {
@@ -321,8 +317,8 @@ module quest_overmind::lending_tests {
         test_scenario::next_tx(scenario, module_owner);
 
         {
-            let admin_cap = test_scenario:: take_from_sender<AdminCap>(scenario);
-            let state = test_scenario::take_shared<ProtocolState>(scenario);
+            let mut admin_cap = test_scenario:: take_from_sender<AdminCap>(scenario);
+            let mut state = test_scenario::take_shared<ProtocolState>(scenario);
 
             lending::create_pool<SUI>(
                 &mut admin_cap, 
@@ -345,9 +341,9 @@ module quest_overmind::lending_tests {
         let deposit_amount_coin1 = 100_000;
 
         {
-            let pool_sui = test_scenario::take_shared<Pool<SUI>>(scenario);
-            let pool_coin1 = test_scenario::take_shared<Pool<COIN1>>(scenario);
-            let state = test_scenario::take_shared<ProtocolState>(scenario);
+            let mut pool_sui = test_scenario::take_shared<Pool<SUI>>(scenario);
+            let mut pool_coin1 = test_scenario::take_shared<Pool<COIN1>>(scenario);
+            let mut state = test_scenario::take_shared<ProtocolState>(scenario);
 
             let coin_sui = coin::mint_for_testing<SUI>(deposit_amount_sui, test_scenario::ctx(scenario));
 
@@ -401,7 +397,7 @@ module quest_overmind::lending_tests {
         let user1 = @0xb;
         let user2 = @0xc;
 
-        let scenario_val = test_scenario::begin(module_owner);
+        let mut scenario_val = test_scenario::begin(module_owner);
         let scenario = &mut scenario_val;
 
         {
@@ -410,8 +406,8 @@ module quest_overmind::lending_tests {
         test_scenario::next_tx(scenario, module_owner);
 
         {
-            let admin_cap = test_scenario:: take_from_sender<AdminCap>(scenario);
-            let state = test_scenario::take_shared<ProtocolState>(scenario);
+            let mut admin_cap = test_scenario:: take_from_sender<AdminCap>(scenario);
+            let mut state = test_scenario::take_shared<ProtocolState>(scenario);
 
             lending::create_pool<SUI>(
                 &mut admin_cap, 
@@ -426,8 +422,8 @@ module quest_overmind::lending_tests {
 
         let deposit_amount = 100_000_000_000; // 100 SUI
         {
-            let pool = test_scenario::take_shared<Pool<SUI>>(scenario);
-            let state = test_scenario::take_shared<ProtocolState>(scenario);
+            let mut pool = test_scenario::take_shared<Pool<SUI>>(scenario);
+            let mut state = test_scenario::take_shared<ProtocolState>(scenario);
 
             let coin = coin::mint_for_testing<SUI>(deposit_amount, test_scenario::ctx(scenario));
 
@@ -445,8 +441,8 @@ module quest_overmind::lending_tests {
 
         let deposit_amount_user2 = 200_000_000_000; // 200 SUI
         {
-            let pool = test_scenario::take_shared<Pool<SUI>>(scenario);
-            let state = test_scenario::take_shared<ProtocolState>(scenario);
+            let mut pool = test_scenario::take_shared<Pool<SUI>>(scenario);
+            let mut state = test_scenario::take_shared<ProtocolState>(scenario);
 
             let coin = coin::mint_for_testing<SUI>(deposit_amount_user2, test_scenario::ctx(scenario));
 
@@ -486,7 +482,7 @@ module quest_overmind::lending_tests {
         let module_owner = @0xa;
         let user = @0xb;
 
-        let scenario_val = test_scenario::begin(module_owner);
+        let mut scenario_val = test_scenario::begin(module_owner);
         let scenario = &mut scenario_val;
 
         {
@@ -495,8 +491,8 @@ module quest_overmind::lending_tests {
         test_scenario::next_tx(scenario, module_owner);
 
         {
-            let admin_cap = test_scenario:: take_from_sender<AdminCap>(scenario);
-            let state = test_scenario::take_shared<ProtocolState>(scenario);
+            let mut admin_cap = test_scenario:: take_from_sender<AdminCap>(scenario);
+            let mut state = test_scenario::take_shared<ProtocolState>(scenario);
 
             lending::create_pool<SUI>(
                 &mut admin_cap, 
@@ -511,8 +507,8 @@ module quest_overmind::lending_tests {
 
         let deposit_amount = 100_000_000_000; // 100 SUI
         {
-            let pool = test_scenario::take_shared<Pool<SUI>>(scenario);
-            let state = test_scenario::take_shared<ProtocolState>(scenario);
+            let mut pool = test_scenario::take_shared<Pool<SUI>>(scenario);
+            let mut state = test_scenario::take_shared<ProtocolState>(scenario);
 
             let coin = coin::mint_for_testing<SUI>(deposit_amount, test_scenario::ctx(scenario));
 
@@ -530,8 +526,8 @@ module quest_overmind::lending_tests {
 
         let withdraw_amount = 100_000_000_000; // 100 SUI
         let coin = {
-            let pool = test_scenario::take_shared<Pool<SUI>>(scenario);
-            let state = test_scenario::take_shared<ProtocolState>(scenario);
+            let mut pool = test_scenario::take_shared<Pool<SUI>>(scenario);
+            let mut state = test_scenario::take_shared<ProtocolState>(scenario);
 
             let coin = lending::withdraw(
                 withdraw_amount, 
@@ -573,7 +569,7 @@ module quest_overmind::lending_tests {
         let module_owner = @0xa;
         let user = @0xb;
 
-        let scenario_val = test_scenario::begin(module_owner);
+        let mut scenario_val = test_scenario::begin(module_owner);
         let scenario = &mut scenario_val;
 
         {
@@ -582,8 +578,8 @@ module quest_overmind::lending_tests {
         test_scenario::next_tx(scenario, module_owner);
 
         {
-            let admin_cap = test_scenario:: take_from_sender<AdminCap>(scenario);
-            let state = test_scenario::take_shared<ProtocolState>(scenario);
+            let mut admin_cap = test_scenario:: take_from_sender<AdminCap>(scenario);
+            let mut state = test_scenario::take_shared<ProtocolState>(scenario);
 
             lending::create_pool<SUI>(
                 &mut admin_cap, 
@@ -598,8 +594,8 @@ module quest_overmind::lending_tests {
 
         let deposit_amount = 100_000_000_000; // 100 SUI
         {
-            let pool = test_scenario::take_shared<Pool<SUI>>(scenario);
-            let state = test_scenario::take_shared<ProtocolState>(scenario);
+            let mut pool = test_scenario::take_shared<Pool<SUI>>(scenario);
+            let mut state = test_scenario::take_shared<ProtocolState>(scenario);
 
             let coin = coin::mint_for_testing<SUI>(deposit_amount, test_scenario::ctx(scenario));
 
@@ -617,8 +613,8 @@ module quest_overmind::lending_tests {
 
         let withdraw_amount = 50_000_000_000; // 50 SUI
         let coin = {
-            let pool = test_scenario::take_shared<Pool<SUI>>(scenario);
-            let state = test_scenario::take_shared<ProtocolState>(scenario);
+            let mut pool = test_scenario::take_shared<Pool<SUI>>(scenario);
+            let mut state = test_scenario::take_shared<ProtocolState>(scenario);
 
             let coin = lending::withdraw(
                 withdraw_amount, 
@@ -660,7 +656,7 @@ module quest_overmind::lending_tests {
         let module_owner = @0xa;
         let user = @0xb;
 
-        let scenario_val = test_scenario::begin(module_owner);
+        let mut scenario_val = test_scenario::begin(module_owner);
         let scenario = &mut scenario_val;
 
         {
@@ -669,8 +665,8 @@ module quest_overmind::lending_tests {
         test_scenario::next_tx(scenario, module_owner);
 
         {
-            let admin_cap = test_scenario:: take_from_sender<AdminCap>(scenario);
-            let state = test_scenario::take_shared<ProtocolState>(scenario);
+            let mut admin_cap = test_scenario:: take_from_sender<AdminCap>(scenario);
+            let mut state = test_scenario::take_shared<ProtocolState>(scenario);
 
             lending::create_pool<SUI>(
                 &mut admin_cap, 
@@ -685,8 +681,8 @@ module quest_overmind::lending_tests {
 
         let deposit_amount = 100_000_000_000; // 100 SUI
         {
-            let pool = test_scenario::take_shared<Pool<SUI>>(scenario);
-            let state = test_scenario::take_shared<ProtocolState>(scenario);
+            let mut pool = test_scenario::take_shared<Pool<SUI>>(scenario);
+            let mut state = test_scenario::take_shared<ProtocolState>(scenario);
 
             let coin = coin::mint_for_testing<SUI>(deposit_amount, test_scenario::ctx(scenario));
 
@@ -704,8 +700,8 @@ module quest_overmind::lending_tests {
 
         let borrow_amount = 50_000_000_000; // 50 SUI
         let coin = {
-            let pool = test_scenario::take_shared<Pool<SUI>>(scenario);
-            let state = test_scenario::take_shared<ProtocolState>(scenario);
+            let mut pool = test_scenario::take_shared<Pool<SUI>>(scenario);
+            let mut state = test_scenario::take_shared<ProtocolState>(scenario);
 
             let coin = lending::borrow(
                 borrow_amount, 
@@ -747,7 +743,7 @@ module quest_overmind::lending_tests {
         let module_owner = @0xa;
         let user = @0xb;
 
-        let scenario_val = test_scenario::begin(module_owner);
+        let mut scenario_val = test_scenario::begin(module_owner);
         let scenario = &mut scenario_val;
 
         {
@@ -756,8 +752,8 @@ module quest_overmind::lending_tests {
         test_scenario::next_tx(scenario, module_owner);
 
         {
-            let admin_cap = test_scenario:: take_from_sender<AdminCap>(scenario);
-            let state = test_scenario::take_shared<ProtocolState>(scenario);
+            let mut admin_cap = test_scenario:: take_from_sender<AdminCap>(scenario);
+            let mut state = test_scenario::take_shared<ProtocolState>(scenario);
 
             lending::create_pool<SUI>(
                 &mut admin_cap, 
@@ -772,8 +768,8 @@ module quest_overmind::lending_tests {
 
         let deposit_amount = 100_000_000_000; // 100 SUI
         {
-            let pool = test_scenario::take_shared<Pool<SUI>>(scenario);
-            let state = test_scenario::take_shared<ProtocolState>(scenario);
+            let mut pool = test_scenario::take_shared<Pool<SUI>>(scenario);
+            let mut state = test_scenario::take_shared<ProtocolState>(scenario);
 
             let coin = coin::mint_for_testing<SUI>(deposit_amount, test_scenario::ctx(scenario));
 
@@ -791,8 +787,8 @@ module quest_overmind::lending_tests {
 
         let borrow_amount = 100_000_000_000; // 100 SUI
         let coin = {
-            let pool = test_scenario::take_shared<Pool<SUI>>(scenario);
-            let state = test_scenario::take_shared<ProtocolState>(scenario);
+            let mut pool = test_scenario::take_shared<Pool<SUI>>(scenario);
+            let mut state = test_scenario::take_shared<ProtocolState>(scenario);
 
             let coin = lending::borrow(
                 borrow_amount, 
@@ -834,7 +830,7 @@ module quest_overmind::lending_tests {
         let module_owner = @0xa;
         let user = @0xb;
 
-        let scenario_val = test_scenario::begin(module_owner);
+        let mut scenario_val = test_scenario::begin(module_owner);
         let scenario = &mut scenario_val;
 
         {
@@ -843,8 +839,8 @@ module quest_overmind::lending_tests {
         test_scenario::next_tx(scenario, module_owner);
 
         {
-            let admin_cap = test_scenario:: take_from_sender<AdminCap>(scenario);
-            let state = test_scenario::take_shared<ProtocolState>(scenario);
+            let mut admin_cap = test_scenario:: take_from_sender<AdminCap>(scenario);
+            let mut state = test_scenario::take_shared<ProtocolState>(scenario);
 
             lending::create_pool<SUI>(
                 &mut admin_cap, 
@@ -859,8 +855,8 @@ module quest_overmind::lending_tests {
 
         let deposit_amount = 100_000_000_000; // 100 SUI
         {
-            let pool = test_scenario::take_shared<Pool<SUI>>(scenario);
-            let state = test_scenario::take_shared<ProtocolState>(scenario);
+            let mut pool = test_scenario::take_shared<Pool<SUI>>(scenario);
+            let mut state = test_scenario::take_shared<ProtocolState>(scenario);
 
             let coin = coin::mint_for_testing<SUI>(deposit_amount, test_scenario::ctx(scenario));
 
@@ -878,8 +874,8 @@ module quest_overmind::lending_tests {
 
         let borrow_amount = 100_000_000_000; // 100 SUI
         let coin = {
-            let pool = test_scenario::take_shared<Pool<SUI>>(scenario);
-            let state = test_scenario::take_shared<ProtocolState>(scenario);
+            let mut pool = test_scenario::take_shared<Pool<SUI>>(scenario);
+            let mut state = test_scenario::take_shared<ProtocolState>(scenario);
 
             let coin = lending::borrow(
                 borrow_amount, 
@@ -896,8 +892,8 @@ module quest_overmind::lending_tests {
         test_scenario::next_tx(scenario, user);
 
         {
-            let pool = test_scenario::take_shared<Pool<SUI>>(scenario);
-            let state = test_scenario::take_shared<ProtocolState>(scenario);
+            let mut pool = test_scenario::take_shared<Pool<SUI>>(scenario);
+            let mut state = test_scenario::take_shared<ProtocolState>(scenario);
 
             lending::repay(
                 coin, 
@@ -933,7 +929,7 @@ module quest_overmind::lending_tests {
         let module_owner = @0xa;
         let user = @0xb;
 
-        let scenario_val = test_scenario::begin(module_owner);
+        let mut scenario_val = test_scenario::begin(module_owner);
         let scenario = &mut scenario_val;
 
         {
@@ -942,8 +938,8 @@ module quest_overmind::lending_tests {
         test_scenario::next_tx(scenario, module_owner);
 
         {
-            let admin_cap = test_scenario:: take_from_sender<AdminCap>(scenario);
-            let state = test_scenario::take_shared<ProtocolState>(scenario);
+            let mut admin_cap = test_scenario:: take_from_sender<AdminCap>(scenario);
+            let mut state = test_scenario::take_shared<ProtocolState>(scenario);
 
             lending::create_pool<SUI>(
                 &mut admin_cap, 
@@ -958,8 +954,8 @@ module quest_overmind::lending_tests {
 
         let deposit_amount = 100_000_000_000; // 100 SUI
         {
-            let pool = test_scenario::take_shared<Pool<SUI>>(scenario);
-            let state = test_scenario::take_shared<ProtocolState>(scenario);
+            let mut pool = test_scenario::take_shared<Pool<SUI>>(scenario);
+            let mut state = test_scenario::take_shared<ProtocolState>(scenario);
 
             let coin = coin::mint_for_testing<SUI>(deposit_amount, test_scenario::ctx(scenario));
 
@@ -976,9 +972,9 @@ module quest_overmind::lending_tests {
         test_scenario::next_tx(scenario, user);
 
         let borrow_amount = 100_000_000_000; // 100 SUI
-        let coin = {
-            let pool = test_scenario::take_shared<Pool<SUI>>(scenario);
-            let state = test_scenario::take_shared<ProtocolState>(scenario);
+        let mut coin = {
+            let mut pool = test_scenario::take_shared<Pool<SUI>>(scenario);
+            let mut state = test_scenario::take_shared<ProtocolState>(scenario);
 
             let coin = lending::borrow(
                 borrow_amount, 
@@ -996,8 +992,8 @@ module quest_overmind::lending_tests {
 
         let repay_amount = 50_000_000_000; // 50 SUI
         {
-            let pool = test_scenario::take_shared<Pool<SUI>>(scenario);
-            let state = test_scenario::take_shared<ProtocolState>(scenario);
+            let mut pool = test_scenario::take_shared<Pool<SUI>>(scenario);
+            let mut state = test_scenario::take_shared<ProtocolState>(scenario);
 
             lending::repay(
                 coin::split(&mut coin, repay_amount, test_scenario::ctx(scenario)), 
@@ -1037,7 +1033,7 @@ module quest_overmind::lending_tests {
         let module_owner = @0xa;
         let user = @0xb;
 
-        let scenario_val = test_scenario::begin(module_owner);
+        let mut scenario_val = test_scenario::begin(module_owner);
         let scenario = &mut scenario_val;
 
         {
@@ -1046,8 +1042,8 @@ module quest_overmind::lending_tests {
         test_scenario::next_tx(scenario, module_owner);
 
         {
-            let admin_cap = test_scenario:: take_from_sender<AdminCap>(scenario);
-            let state = test_scenario::take_shared<ProtocolState>(scenario);
+            let mut admin_cap = test_scenario:: take_from_sender<AdminCap>(scenario);
+            let mut state = test_scenario::take_shared<ProtocolState>(scenario);
 
             lending::create_pool<SUI>(
                 &mut admin_cap, 
@@ -1061,8 +1057,8 @@ module quest_overmind::lending_tests {
         test_scenario::next_tx(scenario, user);
 
         {
-            let pool = test_scenario::take_shared<Pool<SUI>>(scenario);
-            let state = test_scenario::take_shared<ProtocolState>(scenario);
+            let mut pool = test_scenario::take_shared<Pool<SUI>>(scenario);
+            let mut state = test_scenario::take_shared<ProtocolState>(scenario);
 
             let coin = coin::mint_for_testing<SUI>(deposit_amount_sui, test_scenario::ctx(scenario));
 
@@ -1089,14 +1085,14 @@ module quest_overmind::lending_tests {
 
         let sui_price = 100; // 1 SUI = 1.00 USD
         {
-            dummy_oracle::init_module(test_scenario::ctx(scenario));
+            oracle::init_module(test_scenario::ctx(scenario));
         };
         test_scenario::next_tx(scenario, module_owner);
 
         {
-            let feed = test_scenario::take_shared<dummy_oracle::PriceFeed>(scenario);
+            let mut feed = test_scenario::take_shared<oracle::PriceFeed>(scenario);
 
-            dummy_oracle::add_new_coin(
+            oracle::add_new_coin(
                 sui_price, 
                 9, 
                 &mut feed
@@ -1109,7 +1105,7 @@ module quest_overmind::lending_tests {
         let expected_health_factor = 160;
         {
             let state = test_scenario::take_shared<ProtocolState>(scenario);
-            let feed = test_scenario::take_shared<dummy_oracle::PriceFeed>(scenario);
+            let feed = test_scenario::take_shared<oracle::PriceFeed>(scenario);
 
 
             let health_factor = lending::calculate_health_factor(
@@ -1136,7 +1132,7 @@ module quest_overmind::lending_tests {
         let module_owner = @0xa;
         let user = @0xb;
 
-        let scenario_val = test_scenario::begin(module_owner);
+        let mut scenario_val = test_scenario::begin(module_owner);
         let scenario = &mut scenario_val;
 
         {
@@ -1145,8 +1141,8 @@ module quest_overmind::lending_tests {
         test_scenario::next_tx(scenario, module_owner);
 
         {
-            let admin_cap = test_scenario:: take_from_sender<AdminCap>(scenario);
-            let state = test_scenario::take_shared<ProtocolState>(scenario);
+            let mut admin_cap = test_scenario:: take_from_sender<AdminCap>(scenario);
+            let mut state = test_scenario::take_shared<ProtocolState>(scenario);
 
             lending::create_pool<SUI>(
                 &mut admin_cap, 
@@ -1166,9 +1162,9 @@ module quest_overmind::lending_tests {
         test_scenario::next_tx(scenario, user);
 
         {
-            let sui_pool = test_scenario::take_shared<Pool<SUI>>(scenario);
-            let coin1_pool = test_scenario::take_shared<Pool<COIN1>>(scenario);
-            let state = test_scenario::take_shared<ProtocolState>(scenario);
+            let mut sui_pool = test_scenario::take_shared<Pool<SUI>>(scenario);
+            let mut coin1_pool = test_scenario::take_shared<Pool<COIN1>>(scenario);
+            let mut state = test_scenario::take_shared<ProtocolState>(scenario);
 
             let sui_coin = coin::mint_for_testing<SUI>(deposit_amount_sui, test_scenario::ctx(scenario));
 
@@ -1206,20 +1202,20 @@ module quest_overmind::lending_tests {
         let sui_price = 100; // 1 SUI = 1.00 USD
         let coin1_price = 100; // 1 coin1 = 1.00 USD
         {
-            dummy_oracle::init_module(test_scenario::ctx(scenario));
+            oracle::init_module(test_scenario::ctx(scenario));
         };
         test_scenario::next_tx(scenario, module_owner);
 
         {
-            let feed = test_scenario::take_shared<dummy_oracle::PriceFeed>(scenario);
+            let mut feed = test_scenario::take_shared<oracle::PriceFeed>(scenario);
 
-            dummy_oracle::add_new_coin(
+            oracle::add_new_coin(
                 sui_price, 
                 9, 
                 &mut feed
             );
 
-            dummy_oracle::add_new_coin(
+            oracle::add_new_coin(
                 coin1_price, 
                 3, 
                 &mut feed
@@ -1232,7 +1228,7 @@ module quest_overmind::lending_tests {
         let expected_health_factor = 2 * 160;
         {
             let state = test_scenario::take_shared<ProtocolState>(scenario);
-            let feed = test_scenario::take_shared<dummy_oracle::PriceFeed>(scenario);
+            let feed = test_scenario::take_shared<oracle::PriceFeed>(scenario);
 
 
             let health_factor = lending::calculate_health_factor(
@@ -1259,7 +1255,7 @@ module quest_overmind::lending_tests {
         let module_owner = @0xa;
         let user = @0xb;
 
-        let scenario_val = test_scenario::begin(module_owner);
+        let mut scenario_val = test_scenario::begin(module_owner);
         let scenario = &mut scenario_val;
 
         {
@@ -1268,8 +1264,8 @@ module quest_overmind::lending_tests {
         test_scenario::next_tx(scenario, module_owner);
 
         {
-            let admin_cap = test_scenario:: take_from_sender<AdminCap>(scenario);
-            let state = test_scenario::take_shared<ProtocolState>(scenario);
+            let mut admin_cap = test_scenario:: take_from_sender<AdminCap>(scenario);
+            let mut state = test_scenario::take_shared<ProtocolState>(scenario);
 
             lending::create_pool<SUI>(
                 &mut admin_cap, 
@@ -1289,9 +1285,9 @@ module quest_overmind::lending_tests {
         test_scenario::next_tx(scenario, user);
 
         {
-            let sui_pool = test_scenario::take_shared<Pool<SUI>>(scenario);
-            let coin1_pool = test_scenario::take_shared<Pool<COIN1>>(scenario);
-            let state = test_scenario::take_shared<ProtocolState>(scenario);
+            let mut sui_pool = test_scenario::take_shared<Pool<SUI>>(scenario);
+            let mut coin1_pool = test_scenario::take_shared<Pool<COIN1>>(scenario);
+            let mut state = test_scenario::take_shared<ProtocolState>(scenario);
 
             let sui_coin = coin::mint_for_testing<SUI>(deposit_amount_sui, test_scenario::ctx(scenario));
 
@@ -1329,20 +1325,20 @@ module quest_overmind::lending_tests {
         let sui_price = 100; // 1 SUI = 1.00 USD
         let coin1_price = 100; // 1 coin1 = 1.00 USD
         {
-            dummy_oracle::init_module(test_scenario::ctx(scenario));
+            oracle::init_module(test_scenario::ctx(scenario));
         };
         test_scenario::next_tx(scenario, module_owner);
 
         {
-            let feed = test_scenario::take_shared<dummy_oracle::PriceFeed>(scenario);
+            let mut feed = test_scenario::take_shared<oracle::PriceFeed>(scenario);
 
-            dummy_oracle::add_new_coin(
+            oracle::add_new_coin(
                 sui_price, 
                 9, 
                 &mut feed
             );
 
-            dummy_oracle::add_new_coin(
+            oracle::add_new_coin(
                 coin1_price, 
                 3, 
                 &mut feed
@@ -1355,7 +1351,7 @@ module quest_overmind::lending_tests {
         let expected_health_factor = 240;
         {
             let state = test_scenario::take_shared<ProtocolState>(scenario);
-            let feed = test_scenario::take_shared<dummy_oracle::PriceFeed>(scenario);
+            let feed = test_scenario::take_shared<oracle::PriceFeed>(scenario);
 
 
             let health_factor = lending::calculate_health_factor(
@@ -1382,7 +1378,7 @@ module quest_overmind::lending_tests {
         let module_owner = @0xa;
         let user = @0xb;
 
-        let scenario_val = test_scenario::begin(module_owner);
+        let mut scenario_val = test_scenario::begin(module_owner);
         let scenario = &mut scenario_val;
 
         {
@@ -1391,8 +1387,8 @@ module quest_overmind::lending_tests {
         test_scenario::next_tx(scenario, module_owner);
 
         {
-            let admin_cap = test_scenario:: take_from_sender<AdminCap>(scenario);
-            let state = test_scenario::take_shared<ProtocolState>(scenario);
+            let mut admin_cap = test_scenario:: take_from_sender<AdminCap>(scenario);
+            let mut state = test_scenario::take_shared<ProtocolState>(scenario);
 
             lending::create_pool<SUI>(
                 &mut admin_cap, 
@@ -1412,9 +1408,9 @@ module quest_overmind::lending_tests {
         test_scenario::next_tx(scenario, user);
 
         {
-            let sui_pool = test_scenario::take_shared<Pool<SUI>>(scenario);
-            let coin1_pool = test_scenario::take_shared<Pool<COIN1>>(scenario);
-            let state = test_scenario::take_shared<ProtocolState>(scenario);
+            let mut sui_pool = test_scenario::take_shared<Pool<SUI>>(scenario);
+            let mut coin1_pool = test_scenario::take_shared<Pool<COIN1>>(scenario);
+            let mut state = test_scenario::take_shared<ProtocolState>(scenario);
 
             let sui_coin = coin::mint_for_testing<SUI>(deposit_amount_sui, test_scenario::ctx(scenario));
 
@@ -1452,20 +1448,20 @@ module quest_overmind::lending_tests {
         let sui_price = 150; // 1 SUI = 1.00 USD
         let coin1_price = 4530; // 1 coin1 = 1.00 USD
         {
-            dummy_oracle::init_module(test_scenario::ctx(scenario));
+            oracle::init_module(test_scenario::ctx(scenario));
         };
         test_scenario::next_tx(scenario, module_owner);
 
         {
-            let feed = test_scenario::take_shared<dummy_oracle::PriceFeed>(scenario);
+            let mut feed = test_scenario::take_shared<oracle::PriceFeed>(scenario);
 
-            dummy_oracle::add_new_coin(
+            oracle::add_new_coin(
                 sui_price, 
                 9, 
                 &mut feed
             );
 
-            dummy_oracle::add_new_coin(
+            oracle::add_new_coin(
                 coin1_price, 
                 3, 
                 &mut feed
@@ -1478,7 +1474,7 @@ module quest_overmind::lending_tests {
         let expected_health_factor = 4992;
         {
             let state = test_scenario::take_shared<ProtocolState>(scenario);
-            let feed = test_scenario::take_shared<dummy_oracle::PriceFeed>(scenario);
+            let feed = test_scenario::take_shared<oracle::PriceFeed>(scenario);
 
 
             let health_factor = lending::calculate_health_factor(
@@ -1506,7 +1502,7 @@ module quest_overmind::lending_tests {
         let module_owner = @0xa;
         let user = @0xb;
 
-        let scenario_val = test_scenario::begin(module_owner);
+        let mut scenario_val = test_scenario::begin(module_owner);
         let scenario = &mut scenario_val;
 
         {
@@ -1515,8 +1511,8 @@ module quest_overmind::lending_tests {
         test_scenario::next_tx(scenario, module_owner);
 
         {
-            let admin_cap = test_scenario:: take_from_sender<AdminCap>(scenario);
-            let state = test_scenario::take_shared<ProtocolState>(scenario);
+            let mut admin_cap = test_scenario:: take_from_sender<AdminCap>(scenario);
+            let mut state = test_scenario::take_shared<ProtocolState>(scenario);
 
             lending::create_pool<SUI>(
                 &mut admin_cap, 
@@ -1536,9 +1532,9 @@ module quest_overmind::lending_tests {
         test_scenario::next_tx(scenario, user);
 
         {
-            let sui_pool = test_scenario::take_shared<Pool<SUI>>(scenario);
-            let coin1_pool = test_scenario::take_shared<Pool<COIN1>>(scenario);
-            let state = test_scenario::take_shared<ProtocolState>(scenario);
+            let mut sui_pool = test_scenario::take_shared<Pool<SUI>>(scenario);
+            let mut coin1_pool = test_scenario::take_shared<Pool<COIN1>>(scenario);
+            let mut state = test_scenario::take_shared<ProtocolState>(scenario);
 
             let sui_coin = coin::mint_for_testing<SUI>(deposit_amount_sui, test_scenario::ctx(scenario));
 
@@ -1584,20 +1580,20 @@ module quest_overmind::lending_tests {
         let sui_price = 150; // 1 SUI = 1.00 USD
         let coin1_price = 4530; // 1 coin1 = 45.30 USD
         {
-            dummy_oracle::init_module(test_scenario::ctx(scenario));
+            oracle::init_module(test_scenario::ctx(scenario));
         };
         test_scenario::next_tx(scenario, module_owner);
 
         {
-            let feed = test_scenario::take_shared<dummy_oracle::PriceFeed>(scenario);
+            let mut feed = test_scenario::take_shared<oracle::PriceFeed>(scenario);
 
-            dummy_oracle::add_new_coin(
+            oracle::add_new_coin(
                 sui_price, 
                 9, 
                 &mut feed
             );
 
-            dummy_oracle::add_new_coin(
+            oracle::add_new_coin(
                 coin1_price, 
                 3, 
                 &mut feed
@@ -1610,7 +1606,7 @@ module quest_overmind::lending_tests {
         let expected_health_factor = 90;
         {
             let state = test_scenario::take_shared<ProtocolState>(scenario);
-            let feed = test_scenario::take_shared<dummy_oracle::PriceFeed>(scenario);
+            let feed = test_scenario::take_shared<oracle::PriceFeed>(scenario);
 
 
             let health_factor = lending::calculate_health_factor(

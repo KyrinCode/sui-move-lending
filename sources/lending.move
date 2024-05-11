@@ -88,16 +88,13 @@
         The decimal precision of each coin is fetched from the price feed with the get_price_and_decimals
         function.
 */
-module quest_overmind::lending {
+module lending::lending {
     //==============================================================================================
     // Dependencies
     //==============================================================================================
     use sui::math;
-    use sui::transfer;
-    use quest_overmind::dummy_oracle;
-    use sui::object::{Self, UID};
+    use lending::oracle;
     use sui::table::{Self, Table};
-    use sui::tx_context::{Self, TxContext};
     use sui::coin::{Self, Coin};
     use sui::balance::{Self, Balance};
 
@@ -117,7 +114,7 @@ module quest_overmind::lending {
         This is the capability resource that is used to create new pools. The AdminCap should be created
         and transferred to the publisher of the protocol.
     */
-    struct AdminCap has key, store {
+    public struct AdminCap has key, store {
         id: UID,
     }
 
@@ -125,7 +122,7 @@ module quest_overmind::lending {
         This is the state of the protocol. It contains the number of pools and the users of the protocol.
         This should be created and shared globally when the protocol is initialized.
     */
-    struct ProtocolState has key {
+    public struct ProtocolState has key {
         id: UID, 
         number_of_pools: u64, // The number of pools in the protocol. Default is 0.
         users: Table<address, UserData> // All user data of the protocol.
@@ -135,12 +132,12 @@ module quest_overmind::lending {
         This is the pool resource. It contains the asset number of the pool, and the reserve of the pool.
         When a pool is created, it should be shared globally.
     */
-    struct Pool<phantom CoinType> has key {
+    public struct Pool<phantom CoinType> has key {
         id: UID, 
         /* 
             The asset number of the pool. This aligns with the index of collateral and borrow amounts in 
             the user data. This is also used to fetch the price and decimal precision of the coin from
-            the price feed with the dummy_oracle::get_price_and_decimals function.
+            the price feed with the oracle::get_price_and_decimals function.
         */
         asset_number: u64, 
         /*
@@ -153,7 +150,7 @@ module quest_overmind::lending {
     /* 
         This is the user data resource. It contains the collateral and borrowed amounts of the user.
     */
-    struct UserData has store {
+    public struct UserData has store {
         /* 
             The amount of collateral the user has in each pool. the index of the collateral amount
             aligns with the asset number of the pool.
@@ -233,7 +230,7 @@ module quest_overmind::lending {
                 table::add(&mut userData.collateral_amount, pool.asset_number, value);
             }
         } else {
-            let collateral_amount = table::new<u64, u64>(ctx);
+            let mut collateral_amount = table::new<u64, u64>(ctx);
             let borrowed_amount = table::new<u64, u64>(ctx);
             table::add(&mut collateral_amount, pool.asset_number, value);
 
@@ -259,7 +256,7 @@ module quest_overmind::lending {
 
         let sender = tx_context::sender(ctx);
 
-        let real_amount_to_withdraw = 0;
+        let mut real_amount_to_withdraw = 0;
 
         if (table::contains(&state.users, sender)) {
 
@@ -295,7 +292,7 @@ module quest_overmind::lending {
 
          let sender = tx_context::sender(ctx);
 
-         let real_amount_to_borrow = 0;
+         let mut real_amount_to_borrow = 0;
 
          if (table::contains(&state.users, sender)) {
             let userData = table::borrow_mut(&mut state.users, sender);
@@ -356,19 +353,19 @@ module quest_overmind::lending {
     public fun calculate_health_factor(
         user: address,
         state: &ProtocolState,
-        price_feed: &dummy_oracle::PriceFeed
+        price_feed: &oracle::PriceFeed
     ): u64 {
-        let collateral_total_amount = 0;
-        let borrowed_total_amount = 0;
+        let mut collateral_total_amount = 0;
+        let mut borrowed_total_amount = 0;
 
         if (table::contains(&state.users, user)) {
 
             let userData = table::borrow(&state.users, user);
 
-            let i = 0;
+            let mut i = 0;
             while(i < state.number_of_pools) {
 
-                let (price, decimals) = dummy_oracle::get_price_and_decimals(i, price_feed);
+                let (price, decimals) = oracle::get_price_and_decimals(i, price_feed);
 
                 if (table::contains(&userData.collateral_amount, i)) {
                     let amount = table::borrow(&userData.collateral_amount, i);
@@ -416,54 +413,3 @@ module quest_overmind::lending {
     }
 }
 
-module quest_overmind::dummy_oracle {
-
-    //==============================================================================================
-    // Dependencies
-    //==============================================================================================
-    use std::vector;
-    use sui::transfer;
-    use sui::object::{Self, UID};
-    use sui::tx_context::TxContext;
-
-    struct PriceFeed has key {
-        id: UID, 
-        prices: vector<u64>,
-        decimals: vector<u8>
-    }
-
-    public fun init_module(ctx: &mut TxContext) {
-        transfer::share_object(
-            PriceFeed {
-                id: object::new(ctx),
-                prices: vector::empty(),
-                decimals: vector::empty()
-            }
-        );
-    }
-
-    public fun add_new_coin(
-        price: u64,
-        decimals: u8,
-        feed: &mut PriceFeed
-    ) {
-        vector::push_back(&mut feed.prices, price);
-        vector::push_back(&mut feed.decimals, decimals);
-    }
-
-    public fun update_price(
-        new_price: u64,
-        coin_number: u64,
-        feed: &mut PriceFeed
-    ) {
-        let existing_price = vector::borrow_mut(&mut feed.prices, coin_number);
-        *existing_price = new_price;
-    }
-
-    public fun get_price_and_decimals(
-        coin_number: u64,
-        feed: &PriceFeed
-    ): (u64, u8) {
-        (*vector::borrow(&feed.prices, coin_number), *vector::borrow(&feed.decimals, coin_number))
-    }
-}
